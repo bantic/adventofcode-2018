@@ -5,6 +5,6 @@ echo "Creating directory for day $1"
 mkdir days/$1
 touch days/$1/part1.js
 touch days/$1/input.txt
-touch days/$1/part2.txt
+touch days/$1/part2.js
 
 echo "Created ./days/$1"
