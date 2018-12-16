@@ -48,38 +48,29 @@ function solve(searchArray) {
 
   function iterate() {
     let _nextRecipes = nextRecipes(recipes[elves[0]], recipes[elves[1]]);
-    recipes.push(..._nextRecipes);
+    for (let _nextRecipe of _nextRecipes) {
+      recipes.push(_nextRecipe);
+      if (arrayEndsWith(recipes, searchArray)) {
+        return true;
+      }
+    }
     elves[0] = (elves[0] + (1 + recipes[elves[0]])) % recipes.length;
     elves[1] = (elves[1] + (1 + recipes[elves[1]])) % recipes.length;
+    return false;
   }
 
   // console.log(display(recipes, elves));
 
   let start = new Date();
   let found = false;
-  let PREFIX = 82100000;
   while (!found) {
     if (recipes.length % 1000000 === 0) {
       console.log('Length:', recipes.length, new Date() - start, elves);
     }
-    // if (recipes.length === PREFIX) {
-    // recipes = recipes.slice(154110);
-    // elves[0] -= 154110;
-    // elves[2] -= 154110;
-    //   console.log('!!!!!!!!!!!!!!!!!!!!!');
-    //   console.log('!!!!!!!!!!!!!!!!!!!!!');
-    //   console.log('!!!!!!!!!!!!!!!!!!!!!');
-    //   console.log('!!!!!!!!!!!!!!!!!!!!!');
-    // }
-    iterate();
-    if (arrayEndsWith(recipes, searchArray)) {
-      found = true;
-      return recipes.length - searchArray.length;
-    }
-    // console.log(display(recipes, elves));
+    found = iterate();
   }
 
-  console.log(recipes.slice(minRecipeCount, minRecipeCount + 10).join(''));
+  return recipes.length - searchArray.length;
 }
 
 module.exports = async function main(lines) {
