@@ -1,6 +1,6 @@
 Advent of Code 2018
 
-https://adventofcode.com/
+https://adventofcode.com/2018/
 
 Add a new day: ./make_day dayNum
 E.g. `./make_day 8`
