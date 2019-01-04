@@ -1,49 +1,75 @@
-// cell: x,y,n,e,w,s
-const map = {};
-const UNKNOWN = {};
-const WALL = {};
-
-function makeCell({ x, y }) {
-  if (map[`${x},${y}`]) {
-    throw `Tried to make cell that exists: ${x},${y}`;
+class Map {
+  constructor() {
+    this.rows = {};
   }
-  let cell = { x, y };
-  map[`${x},${y}`] = cell;
-  return cell;
+
+  addNode(node) {
+    this.set(node.x, node.y, node);
+  }
+
+  getRow(y) {
+    return this.rows[y] || (this.rows[y] = {});
+  }
+
+  set(x, y, node) {
+    this.getRow(y)[x] = node;
+  }
+
+  get(x, y) {
+    return this.getRow(y)[x] || { x, y, dist: Number.POSITIVE_INFINITY };
+  }
 }
 
-const DIRS = {
-  N: [0, 1],
-  E: [1, 0],
-  S: [0, -1],
-  W: [-1, 0]
-};
+function process(input) {
+  let chars = input.trim().split('');
+  let currentNode = { x: 0, y: 0, dist: 0 };
+  let stack = [currentNode];
+  let map = new Map();
 
-const OPP_DIR = {
-  N: 'S',
-  E: 'W',
-  S: 'N',
-  W: 'E'
-};
-
-function move(fromCell, dir) {
-  let delta = DIRS[dir];
-  let [x, y] = [fromCell.x + delta[0], fromCell.y + delta[1]];
-  let toCell = map[`${x},${y}`] || makeCell({ x, y });
-  if (fromCell[dir] === WALL) {
-    throw `Tried to move in dir that was already wall`;
+  function add(dx, dy) {
+    let node = map.get(currentNode.x + dx, currentNode.y + dy);
+    node.dist = Math.min(node.dist, currentNode.dist + 1);
+    currentNode = node;
+    map.addNode(node);
   }
-  fromCell[dir] = toCell;
-  toCell[OPP_DIR[dir]] = fromCell;
-  return toCell;
-}
 
+  chars.forEach(c => {
+    switch (c) {
+      case 'N':
+        add(0, -1);
+        break;
+      case 'S':
+        add(0, 1);
+        break;
+      case 'E':
+        add(1, 0);
+        break;
+      case 'W':
+        add(-1, 0);
+        break;
+      case '(':
+        stack.push(currentNode);
+        break;
+      case ')':
+        currentNode = stack.pop();
+        break;
+      case '|':
+        currentNode = stack[stack.length - 1];
+        break;
+      default:
+        break;
+    }
+  });
+
+  let dists = [];
+  for (let r in map.rows) {
+    for (let k in map.rows[r]) {
+      dists.push(map.rows[r][k].dist);
+    }
+  }
+
+  return Math.max(...dists);
+}
 module.exports = async function main(lines) {
-  let regex = lines[0];
-  let origin = makeCell({ x: 0, y: 0 });
-  origin = move(origin, 'W');
-  origin = move(origin, 'N');
-  origin = move(origin, 'E');
-  map;
-  debugger;
+  console.log(process(lines[0]));
 };
